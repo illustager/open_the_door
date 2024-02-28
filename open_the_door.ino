@@ -1,8 +1,8 @@
 #define DEBUG
 
 //-----------------------------------------------------------舵机
-#include "servo.h"
-myServoClass my_servo(4, 500, 2500); // 舵机引脚 以及最小最大脉冲宽度
+#include "myServo.h"
+myServo my_servo(4, 500, 2500); // 舵机引脚 以及最小最大脉冲宽度
 
 #define servo_delay_time 3 // 此处单位为 s
 
@@ -12,7 +12,7 @@ myServoClass my_servo(4, 500, 2500); // 舵机引脚 以及最小最大脉冲宽
 #define rc522_SS_PIN  12
 #define rc522_RST_PIN 27 // 重置引脚
 
-#include "IC_read.h"
+#include "myIC.h"
 myIC my_ic(rc522_SS_PIN,rc522_RST_PIN);
 
 #include "user_data.h"
@@ -22,11 +22,11 @@ myIC my_ic(rc522_SS_PIN,rc522_RST_PIN);
 // #define SCL   22
 
 // #include "4_pin_screen.h"
-// myScreenClass my_screen(0x3c, SDA, SCL);
+// myScreen my_screen(0x3c, SDA, SCL);
 
 //--------------------------------------------------------------------音频
-#include "play.h"
-myAudioClass my_audio(25); // 音频引脚
+#include "myAudio.h"
+myAudio my_audio(25); // 音频引脚
 
 volatile bool is2play; // volatile !!!!!!!!!! 用于多线程之间的通信
 TaskHandle_t playHandle = NULL; // 多线程句柄

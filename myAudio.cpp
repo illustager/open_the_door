@@ -1,32 +1,10 @@
-#include <XT_DAC_Audio.h>
+#include "myAudio.h"
 
-#include "soundData.h"
+#include "sound_data.h"
 
-class myAudioClass {
-public:
-  myAudioClass(byte pin) : playPIN(pin) {
-      DacAudio = new XT_DAC_Audio_Class(playPIN,0);
-      this->init();
-  };
-  
-  ~myAudioClass() {
-    for( int i = 0; i < 8; i++ ) {
-      delete pSound[i];
-    }
-    delete DacAudio;
-  }
-
-  void play();
-
-private:
-  byte playPIN;
-  XT_Wav_Class *pSound[8];
-  XT_DAC_Audio_Class *DacAudio;
-
-  void init();
-};
-
-void myAudioClass::init() {
+myAudio::myAudio(byte pin) : playPIN(pin) {
+  DacAudio = new XT_DAC_Audio_Class(playPIN,0);
+      
   digitalWrite( playPIN, LOW );
 
   pSound[0] = new XT_Wav_Class(russian);
@@ -39,7 +17,14 @@ void myAudioClass::init() {
   pSound[7] = new XT_Wav_Class(eg);
 }
 
-void myAudioClass::play() {
+myAudio::~myAudio() {
+  delete DacAudio;
+  for( int i = 0; i < 8; ++i ) {
+    delete pSound[i];
+  }
+}
+
+void myAudio::play() {
   static RTC_DATA_ATTR byte select = 0;
 
   select = (select + 1) % 8;

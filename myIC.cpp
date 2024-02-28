@@ -1,19 +1,4 @@
-#include <SPI.h>
-#include <MFRC522.h>
-
-class myIC {
-public:
-  myIC(byte ss,byte rst);
-  myIC(myIC & obj);
-  ~myIC();
-
-  bool readyet();
-  uint32_t read();
-
-private:
-  MFRC522 *my_rfid;
-  byte ss, rst;
-};
+#include "myIC.h"
 
 myIC::myIC(byte ss, byte rst) {
   this->ss = ss;
@@ -55,5 +40,3 @@ uint32_t myIC::read() {
   //rfid.PICC_HaltA();
   // 停止读卡模块编码
   //rfid.PCD_StopCrypto1();
-
- 
