@@ -1,22 +1,36 @@
+#include <ESP32Servo.h>
 
-class mc_Servo {
+class myServoClass {
 public:
-  void m_servo_init();
-  void m_servo_work(int);
-  // Servo &m_get_myservo();
+  myServoClass(byte pin, unsigned minUs = 500, unsigned maxUs = 2500) 
+    : servoPin(pin), minUs(minUs), maxUs(maxUs) {
+      this->init();
+  };
+  
+  ~myServoClass() {
+    // myservo.detach();
+  }
+
+  void work(int);
+
 private:
   Servo myservo;
+  byte servoPin;
+  unsigned minUs;
+  unsigned maxUs;
+
+  void init();
 };
 
 
-void mc_Servo::m_servo_init() {
-  ESP32PWM::allocateTimer(0);//如有需要可以将四个计时器全部开启，此处仅开启0计时器。在ESP32Servo中的ESP32PWM.cpp中可以查看相关事项
-  myservo.setPeriodHertz(50);
-  myservo.attach(servoPin, minUs, maxUs); // 舵机连接到指定引脚
+void myServoClass::init() {
+  ESP32PWM::allocateTimer(0); // 如有需要可以将四个计时器全部开启 此处仅开启 0 计时器 在 ESP32Servo 中的 ESP32PWM.cpp 中可以查看相关事项
+  this->myservo.setPeriodHertz(50);
+  this->myservo.attach(this->servoPin, this->minUs, this->maxUs); // 舵机连接到指定引脚
 }
 
-void mc_Servo::m_servo_work(int angle) {
-  myservo.write(angle);
+void myServoClass::work(int angle) {
+  this->myservo.write(angle);
 }
 
 

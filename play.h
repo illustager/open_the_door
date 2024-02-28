@@ -1,11 +1,35 @@
-// #include "esp32-hal-gpio.h"
+#include <XT_DAC_Audio.h>
+
 #include "soundData.h"
 
-XT_Wav_Class *pSound[8];
-XT_DAC_Audio_Class DacAudio(play_PIN,0);
+class myAudioClass {
+public:
+  myAudioClass(byte pin, volatile bool *is2play) 
+    : playPIN(pin), ptr_is2play(ptr_is2play) {
+      DacAudio = new XT_DAC_Audio_Class(playPIN,0);
+      this->init();
+  };
+  
+  ~myAudioClass() {
+    for( int i = 0; i < 8; i++ ) {
+      delete pSound[i];
+    }
+    delete DacAudio;
+  }
 
-void initPlay() {
-  digitalWrite( play_PIN, LOW );
+  void play(void*);
+
+private:
+  byte playPIN;
+  volatile bool *ptr_is2play;
+  XT_Wav_Class *pSound[8];
+  XT_DAC_Audio_Class *DacAudio;
+
+  void init();
+};
+
+void myAudioClass::init() {
+  digitalWrite( playPIN, LOW );
 
   randomSeed( analogRead(0) );
   // 裸机程序 应该不需要 delete 吧
@@ -19,26 +43,28 @@ void initPlay() {
   pSound[7] = new XT_Wav_Class(eg);
 }
 
-void play(void*) {
+void myAudioClass::play(void*) {
   byte select = 0;
 
   while( true ) {
     
-    if( !is2play ) continue;
+    if( !*ptr_is2play ) continue;
 
-    is2play = false;
+    *ptr_is2play = false;
     
     select = random(8);
-    DacAudio.Play( pSound[select] );
+    DacAudio->Play( pSound[select] );
 
     while( pSound[select]->Playing ) {
-      DacAudio.FillBuffer();
+      DacAudio->FillBuffer();
     }
 
+#ifdef DEBUG
     Serial.println("voice");
+#endif
 
     break;
   }
-  vTaskDelete( play_Handle );
+
   return;
 }

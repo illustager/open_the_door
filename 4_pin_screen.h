@@ -1,29 +1,41 @@
-// #include "HardwareSerial.h"
+#include <SSD1306Wire.h>
 
-SSD1306Wire myscreen(0x3c, SDA, SCL);
+class myScreenClass {
+public:
+  myScreenClass(byte addr, byte sda, byte scl) 
+    : addr(addr), sda(sda), scl(scl) {
+      myscreen = new SSD1306Wire(addr, sda, scl);
+      myscreen->init();
+      myscreen->setFont(ArialMT_Plain_16);
+      myscreen->setFont(ArialMT_Plain_16);
+  };
+  
+  ~myScreenClass() {
+    delete myscreen;
+  }
 
-void myscreen_init(){
-  // 初始化OLED显示
-  myscreen.init();
-  // myscreen.flipScreenVertically(); // 垂直翻转屏幕设置
-  myscreen.setFont(ArialMT_Plain_16); // 设置字体大小
+  void debug(uint32_t, bool);
 
-}
+private:
+  SSD1306Wire *myscreen;
+  byte addr, sda, scl;
+};
 
-void myscreen_print(uint32_t uid, bool flag, byte cont){
-  // RTC_DATA_ATTR byte cont = 0;
+void myScreenClass::debug(uint32_t uid, bool flag){
+  static RTC_DATA_ATTR byte cnt = 0;
+
   char buff[100] = {};
   sprintf( buff, "%d", flag);
-  sprintf( buff+2, "%d", cont);
+  sprintf( buff+2, "%d", cnt);
   sprintf( buff+20, "%u", uid);
 
-  // 在OLED屏幕上显示天气信息
-  myscreen.clear();
-  myscreen.drawString(0, 10, buff);
-  myscreen.drawString(0, 30, buff+2);
-  myscreen.drawString(0, 50, buff+20);
-  myscreen.display();
+  // 在 OLED 屏幕上显示天气信息
+  myscreen->clear();
+  myscreen->drawString(0, 10, buff);
+  myscreen->drawString(0, 30, buff+2);
+  myscreen->drawString(0, 50, buff+20);
+  myscreen->display();
 
-  cont++;
+  ++cnt;
 }
 
