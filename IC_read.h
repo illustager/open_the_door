@@ -1,8 +1,6 @@
 #include <SPI.h>
 #include <MFRC522.h>
 
-#include "user_data.h"
-
 class myIC {
 public:
   myIC(byte ss,byte rst);
