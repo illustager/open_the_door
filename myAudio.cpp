@@ -24,10 +24,8 @@ myAudio::~myAudio() {
   }
 }
 
-void myAudio::play() {
-  static RTC_DATA_ATTR byte select = 0;
-
-  select = (select + 1) % 8;
+void myAudio::play(byte select) {
+  select %= 8;
 
   DacAudio->Play( pSound[select] );
 

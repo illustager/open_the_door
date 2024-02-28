@@ -1,4 +1,4 @@
-#define DEBUG
+// #define DEBUG
 
 //-----------------------------------------------------------舵机
 #include "myServo.h"
@@ -18,11 +18,12 @@ myIC my_ic(rc522_SS_PIN,rc522_RST_PIN);
 #include "user_data.h"
 
 //-----------------------------------------------------------------------4脚 OLED
-// #define SDA   21
-// #define SCL   22
-
-// #include "4_pin_screen.h"
-// myScreen my_screen(0x3c, SDA, SCL);
+#ifdef DEBUG
+#define SDA   21
+#define SCL   22
+#include "myScreen.h"
+myScreen my_screen(0x3c, SDA, SCL);
+#endif
 
 //--------------------------------------------------------------------音频
 #include "myAudio.h"
@@ -32,10 +33,13 @@ volatile bool is2play; // volatile !!!!!!!!!! 用于多线程之间的通信
 TaskHandle_t playHandle = NULL; // 多线程句柄
 
 void playTask(void*) { // 多线程任务函数 - 播放音频
+  static RTC_DATA_ATTR byte select = 0;
+  
   while(true) {
     if( is2play ) {
-      my_audio.play();
+      my_audio.play(select);
       is2play = false;
+      ++select;
     }
   }
 }
@@ -83,8 +87,9 @@ void setup() {
 void loop() {
 
   // 实现 esp32 在唤醒后维持一段时间的运行
-
+#ifdef DEBUG
   Serial.println("Running...");
+#endif
 
   uint64_t startTime = millis();
   while( millis() - startTime < wakeup_work_time * 1000 ) {
@@ -93,7 +98,9 @@ void loop() {
       bool check_flag = user_data::check(uid);
       // my_screen.debug(uid, check_flag);
       if(check_flag) {
+      #ifdef DEBUG
         Serial.println("Welcome!");
+      #endif
         digitalWrite(LEDPin, HIGH);
         is2play = true;
         //---------------------------------------------------

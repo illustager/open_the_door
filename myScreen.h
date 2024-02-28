@@ -1,21 +1,15 @@
 #ifndef MYSCREEN_H
 #define MYSCREEN_H
 
+#include <Arduino.h>
+
 #include <SSD1306Wire.h>
 
 class myScreen {
 public:
-  myScreen(byte addr, byte sda, byte scl) 
-    : addr(addr), sda(sda), scl(scl) {
-      myscreen = new SSD1306Wire(addr, sda, scl);
-      myscreen->init();
-      myscreen->setFont(ArialMT_Plain_16);
-      myscreen->setFont(ArialMT_Plain_16);
-  };
+  myScreen(byte addr, byte sda, byte scl);
   
-  ~myScreen() {
-    delete myscreen;
-  }
+  ~myScreen();
 
   void debug(uint32_t, bool);
 

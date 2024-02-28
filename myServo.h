@@ -1,11 +1,13 @@
 #ifndef MYSERVO_H
 #define MYSERVO_H
 
+#include <Arduino.h>
+
 #include <ESP32Servo.h>
 
 class myServo {
 public:
-  myServo(byte pin, unsigned minUs = 500, unsigned maxUs = 2500);
+  myServo(byte pin, unsigned minUs, unsigned maxUs);
   
   ~myServo();
 

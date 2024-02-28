@@ -1,6 +1,8 @@
 #ifndef MYAUDIO_H
 #define MYAUDIO_H
 
+#include <Arduino.h>
+
 #include <XT_DAC_Audio.h>
 
 class myAudio {
@@ -8,7 +10,7 @@ public:
   myAudio(byte pin);
   ~myAudio();
 
-  void play();
+  void play(byte select);
 
 private:
   byte playPIN;

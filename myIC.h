@@ -1,6 +1,8 @@
 #ifndef MYIC_H
 #define MYIC_H
 
+#include <Arduino.h>
+
 #include <SPI.h>
 #include <MFRC522.h>
 
