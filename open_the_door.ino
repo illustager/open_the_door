@@ -1,4 +1,4 @@
-// #define DEBUG
+#define DEBUG
 
 //-----------------------------------------------------------舵机
 #include "myServo.h"
@@ -82,6 +82,7 @@ void loop() {
 #ifdef DEBUG
   Serial.println("Running...");
 #endif
+  analogWrite(LEDPin, 25);
 
   uint64_t startTime = millis();
   while( millis() - startTime < wakeup_work_time * 1000 ) {
@@ -93,7 +94,7 @@ void loop() {
       #ifdef DEBUG
         Serial.println("Welcome!");
       #endif
-        digitalWrite(LEDPin, HIGH);
+        analogWrite(LEDPin, 255);
         is2play = true;
         //---------------------------------------------------
         my_servo.work(135);
@@ -102,7 +103,6 @@ void loop() {
         my_servo.work(0);
     
         //-----------------------------------------
-        digitalWrite(LEDPin, LOW);
         break;
       }
     }
@@ -112,6 +112,7 @@ void loop() {
 #ifdef DEBUG
   Serial.println("ESP32 will sleep now!");
 #endif
+  analogWrite(LEDPin, 0);
   delay(100);
   touchAttachInterrupt(touchPin, callbackFun, threshold);
   esp_deep_sleep_start();
