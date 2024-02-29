@@ -17,14 +17,6 @@ myIC my_ic(rc522_SS_PIN,rc522_RST_PIN);
 
 #include "user_data.h"
 
-//-----------------------------------------------------------------------4脚 OLED
-#ifdef DEBUG
-#define SDA   21
-#define SCL   22
-#include "myScreen.h"
-myScreen my_screen(0x3c, SDA, SCL);
-#endif
-
 //--------------------------------------------------------------------音频
 #include "myAudio.h"
 myAudio my_audio(25); // 音频引脚
