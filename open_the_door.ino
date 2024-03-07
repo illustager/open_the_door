@@ -4,17 +4,17 @@
 #include "config.h"
 
 //------------------------------------------------------------舵机
-#include "myServo.h"
+#include <myServo.h>
 myServo my_servo(servoPin, servoMinPulse, servoMaxPulse);
 
 //------------------------------------------------------------读卡器与用户数据
-#include "myIC.h"
+#include <myIC.h>
 myIC my_ic(rc522_SS_PIN,rc522_RST_PIN);
 
 #include "user_data.h"
 
 //------------------------------------------------------------音频
-#include "myAudio.h"
+#include <myAudio.h>
 myAudio my_audio(audioPin, audioNum, audioDatas);
 
 volatile bool is2play; 			// volatile !!!!!!!!!! 用于多线程之间的通信
