@@ -16,11 +16,11 @@ namespace user_data {
 	};
 
 	int check(uint32_t id) { // 匹配失败返回 -1 否则返回用户在 all_user 中的索引
-	for(byte i = 0; i < user_num; i++) {
-		if(all_users[i].id == id)  return (int)i;
+		for(byte i = 0; i < user_num; ++i) {
+			if(all_users[i].id == id)  return (int)i;
+		}
+		return -1;
 	}
-	return -1;
-}
 
 } // namespace user_data
 

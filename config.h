@@ -4,6 +4,10 @@
 //------------------------------------------------------------DEBUG 模式
 #define DEBUG
 
+#ifdef DEBUG
+//do something
+#endif
+
 //------------------------------------------------------------舵机
 #define servoPin 		4       // 舵机引脚
 
@@ -12,7 +16,7 @@
 
 #define servoDelayTime 	3 		// 秒
 
-#define servoOpenAngle  100		// 舵机开关门的角度
+#define servoOpenAngle  130		// 舵机开关门的角度
 #define servoCloseAngle 0
 
 //------------------------------------------------------------读卡器与用户数据
@@ -40,7 +44,7 @@ const byte *sound_datas[] = {	sound_data::cn,
 
 //------------------------------------------------------------睡眠
 #define touchPin  	33 		// 触摸引脚
-#define threshold 	30 		// 触摸阈值
+#define threshold 	20 		// 触摸阈值
 #define wakeupTime 	10 		// 秒 醒来之后的工作时间
 #define delayTime 	1500  	// 毫秒 开完门之后的延时时间 时间过短则舵机来不及恢复到初始位置 
 

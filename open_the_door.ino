@@ -49,6 +49,11 @@ void setup() {
 	Serial.begin(115200);
 #endif
 
+	// while(true) {
+	// 	Serial.println(touchRead(touchPin));
+	// 	delay(500);
+	// }
+
 	esp_sleep_enable_touchpad_wakeup();
 	// 在 esp32 中 断分为两种 写入不同位置
 	// 一种是 RTC 中断 如定时器中断 触摸中断
@@ -57,16 +62,16 @@ void setup() {
 	touchDetachInterrupt(touchPin); // 先解除中断 而后在 loop 中重新启用中断 以免多次触发中断
 
 	pinMode(LEDPin, OUTPUT);
-	analogWrite(LEDPin, LEDoff);
+	analogWrite(LEDPin, LEDoff); // digitalWrite(LEDPin, LOW);
 
 	my_servo.work(servoCloseAngle); // 初始化舵机
 
-	xTaskCreate(  playTask,         // 任务函数
-				  "play",           // 任务名称
-				  8*1024,           // 任务栈大小，根据需要自行设置
-				  NULL,             // 参数 入参为空
-				  1,                // 优先级
-				  &playHandle );    // 任务句柄
+	// xTaskCreate(  playTask,         // 任务函数
+	// 			  "play",           // 任务名称
+	// 			  8*1024,           // 任务栈大小，根据需要自行设置
+	// 			  NULL,             // 参数 入参为空
+	// 			  1,                // 优先级
+	// 			  &playHandle );    // 任务句柄
 
 } // setup
 
@@ -83,6 +88,11 @@ void loop() {
 		if( my_ic.readyet() ) {
 			uint32_t uid = my_ic.read();
 			int check_flag = user_data::check(uid);
+
+			#ifdef DEBUG
+				Serial.println(uid);
+				Serial.println(check_flag);
+			#endif
 
 			if( check_flag >= 0 ) {
 			#ifdef DEBUG
