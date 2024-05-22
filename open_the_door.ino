@@ -5,11 +5,9 @@
 #include <myServo.h>
 myServo my_servo(servoPin, servoMinPulse, servoMaxPulse);
 
-//------------------------------------------------------------读卡器与用户数据
+//------------------------------------------------------------读卡器
 #include <myIC.h>
 myIC my_ic(rc522_SS_PIN,rc522_RST_PIN);
-
-#include "user_data.h"
 
 //------------------------------------------------------------音频
 #include <myAudio.h>
