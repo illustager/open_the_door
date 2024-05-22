@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <Preferences.h>
-#include <Keypad.h>
 #include <AceSorting.h>
 
 #include "manage.h"
@@ -130,7 +129,7 @@ static void display4edit(myio::OLEDstream* myout, const uint32_t* data) {
 	myout->flush();
 }
 
-static bool edit(myio::OLEDstream* myout, Keypad* kpd) {
+static bool edit(myio::OLEDstream* myout, Keypad* kpd, myIC* my_ic) {
 	uint32_t userdata_cpy[usermax];
 	memcpy(userdata_cpy, userdata, sizeof(userdata));
 
@@ -144,16 +143,10 @@ static bool edit(myio::OLEDstream* myout, Keypad* kpd) {
 	bool sure;
 	bool changed = false;
 	while( true ) {
-		if( Serial.available() ) {
-			uint32_t uid;
-			Serial.readBytes((char*)&uid, sizeof(uid));
-			for( int i = 0; i < sizeof(uid)/2; ++i ) {
-				byte tmp = ((byte*)&uid)[i];
-				((byte*)&uid)[i] = ((byte*)&uid)[sizeof(uid)-i-1];
-				((byte*)&uid)[sizeof(uid)-i-1] = tmp;
-			}
+		if( my_ic->readyet() ) {
+			uint32_t uid = my_ic->read();
 			int idx = checkUserData(uid);
-			Serial.println(idx);
+			// Serial.println(idx);
 
 			if( idx >= 0 ) {
 				eraseCursor4edit(myout, i);
@@ -257,7 +250,7 @@ int checkUserData(uint32_t uid) {
 	return -1;
 }
 
-void manage(Keypad* kpd) {
+void manage(Keypad* kpd, myIC* my_ic) {
 	myio::OLEDstream *myout = new myio::OLEDstream(pinnum, outpins);
 
 	while( true ) {
@@ -281,7 +274,7 @@ void manage(Keypad* kpd) {
 		}
 	}
 
-	if( edit(myout, kpd) ) {
+	if( edit(myout, kpd, my_ic) ) {
 		nvsSave(userdata, sizeof(userdata));
 	}
 
