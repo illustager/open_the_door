@@ -15,7 +15,7 @@ static const char* nvsname = "manage";
 static const char* nvskey = "userdata";
 
 // ------------------------------ Password ------------------------------
-static const char* password = "1";
+static const char* password = "20240522";
 
 // ------------------------------ User Data ------------------------------
 static const unsigned usermax = 10;
@@ -145,7 +145,7 @@ static bool edit(myio::OLEDstream* myout, Keypad* kpd, myIC* my_ic) {
 	while( true ) {
 		if( my_ic->readyet() ) {
 			uint32_t uid = my_ic->read();
-			int idx = checkUserData(uid);
+			int idx = checkUserData(uid, userdata_cpy);
 			// Serial.println(idx);
 
 			if( idx >= 0 ) {
@@ -159,12 +159,7 @@ static bool edit(myio::OLEDstream* myout, Keypad* kpd, myIC* my_ic) {
 					userdata_cpy[i] = uid;
 					dataSort(userdata_cpy, usermax);
 
-					for( int p = 0; p < usermax; ++p ) {
-						if( userdata_cpy[p] == uid ) {
-							i = p;
-							break;
-						}
-					}
+					i = checkUserData(uid, userdata_cpy);
 				}
 			}
 			display4edit(myout, userdata_cpy);
@@ -237,13 +232,17 @@ void loadUserData() {
 	nvsLoad(userdata, sizeof(userdata));
 }
 
-int checkUserData(uint32_t uid) {
-	dataSort(userdata, usermax);
+int checkUserData(uint32_t uid, uint32_t* data) {
+	if( data == NULL ) {
+		data = userdata;
+	}
+
+	dataSort(data, usermax);
 	for( int i = 0; i < usermax; ++i ) {
-		if( userdata[i] == 0 ) {
+		if( data[i] == 0 ) {
 			break;
 		}
-		if( userdata[i] == uid ) {
+		if( data[i] == uid ) {
 			return i;
 		}
 	}

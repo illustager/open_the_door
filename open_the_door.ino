@@ -53,6 +53,21 @@ void setup() {
 	Serial.begin(115200);
 #endif
 
+	// for( byte i : rowPins ) {
+	// 	pinMode(i, INPUT);
+	// }
+	// for( byte i : colPins ) {
+	// 	pinMode(i, OUTPUT);
+	// }
+
+	// while( true ) {
+	// 	char key = kpd.getKey();
+
+	// 	if( key != NO_KEY ) {
+	// 		Serial.println(key);
+	// 	}
+	// }
+
 	// while(true) {
 	// 	Serial.println(touchRead(touchPin));
 	// 	delay(500);
@@ -100,7 +115,7 @@ void loop() {
 
 		if( my_ic.readyet() ) {
 			uint32_t uid = my_ic.read();
-			int check_flag = checkUserData(uid);
+			int check_flag = checkUserData(uid, NULL);
 
 			#ifdef DEBUG
 				Serial.println(uid);

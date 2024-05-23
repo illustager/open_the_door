@@ -3,4 +3,4 @@
 
 void manage(Keypad* kpd, myIC* my_ic);
 void loadUserData();
-int checkUserData(uint32_t uid);
+int checkUserData(uint32_t uid, uint32_t* data);
