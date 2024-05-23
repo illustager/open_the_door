@@ -5,11 +5,9 @@
 #include <myServo.h>
 myServo my_servo(servoPin, servoMinPulse, servoMaxPulse);
 
-//------------------------------------------------------------读卡器与用户数据
+//------------------------------------------------------------读卡器
 #include <myIC.h>
 myIC my_ic(rc522_SS_PIN,rc522_RST_PIN);
-
-#include "user_data.h"
 
 //------------------------------------------------------------音频
 #include <myAudio.h>
@@ -39,7 +37,13 @@ void callbackFunc() { // 回调函数
 	// Serial.println("good");
 }
 
-//------------------------------------------------------------指示灯
+//------------------------------------------------------------键盘和管理系统
+#include <Keypad.h>
+#include "manage.h"
+
+unsigned times4wake PROGMEM = 0;
+
+Keypad kpd(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 //------------------------------------------------------------
 
@@ -48,6 +52,21 @@ void setup() {
 #ifdef DEBUG
 	Serial.begin(115200);
 #endif
+
+	// for( byte i : rowPins ) {
+	// 	pinMode(i, INPUT);
+	// }
+	// for( byte i : colPins ) {
+	// 	pinMode(i, OUTPUT);
+	// }
+
+	// while( true ) {
+	// 	char key = kpd.getKey();
+
+	// 	if( key != NO_KEY ) {
+	// 		Serial.println(key);
+	// 	}
+	// }
 
 	// while(true) {
 	// 	Serial.println(touchRead(touchPin));
@@ -73,6 +92,11 @@ void setup() {
 	// 			  1,                // 优先级
 	// 			  &playHandle );    // 任务句柄
 
+	++times4wake;
+	if( times4wake == 1 ) {
+		loadUserData();
+	}
+
 } // setup
 
 void loop() {
@@ -85,9 +109,13 @@ void loop() {
 
 	uint64_t startTime = millis();
 	while( millis() - startTime < wakeupTime * 1000 ) {
+		if( kpd.getKey() == 'D' ) {
+			manage(&kpd, &my_ic);
+		}
+
 		if( my_ic.readyet() ) {
 			uint32_t uid = my_ic.read();
-			int check_flag = user_data::check(uid);
+			int check_flag = checkUserData(uid, NULL);
 
 			#ifdef DEBUG
 				Serial.println(uid);
