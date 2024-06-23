@@ -19,7 +19,7 @@ static const char* password = "20240522";
 
 // ------------------------------ User Data ------------------------------
 static const unsigned usermax = 10;
-static uint32_t userdata[usermax] PROGMEM = {0xDED0135F};
+static RTC_DATA_ATTR uint32_t userdata[usermax] = {0xDED0135F};
 
 // ------------------------------ Functions ------------------------------
 

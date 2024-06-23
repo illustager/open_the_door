@@ -11,6 +11,8 @@
 namespace lowpower {
 	void init() {
 		esp_sleep_enable_touchpad_wakeup();
+		touchAttachInterrupt(touchPin, callback, touchThreshold);
+		touchDetachInterrupt(touchPin);
 	}
 
 	void start() {

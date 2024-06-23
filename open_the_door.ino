@@ -44,6 +44,8 @@ unsigned RTC_DATA_ATTR times4wake = 0; // 记录唤醒次数
 //------------------------------------------------------------
 
 void setup() {
+	Serial.begin(115200);
+
 	// 设置睡眠和触摸唤醒
 	lowpower::init();
 
@@ -56,7 +58,7 @@ void setup() {
 	working = false;
 
 	// 开门时播放音频
-	xTaskCreate(  play::task,       // 任务函数
+	xTaskCreate(  &play::task,      // 任务函数
 				  "play",           // 任务名称
 				  8*1024,           // 任务栈大小，根据需要自行设置
 				  (void*)&working,  // 参数 入参为空

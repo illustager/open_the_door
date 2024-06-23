@@ -12,9 +12,6 @@
 
 namespace statusinfo {
 	void init() {
-	#ifdef DEBUG
-		Serial.begin(115200);
-	#endif
 		pinMode(LEDPin, OUTPUT);
 		analogWrite(LEDPin, LEDoff);
 	}
