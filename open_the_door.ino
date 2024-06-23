@@ -17,7 +17,7 @@ volatile bool working; 			// volatile !!!!!!!!!! 用于多线程之间的通信
 TaskHandle_t taskHandle = NULL; // 多线程句柄
 
 //------------------------------------------------------------休眠
-#include "sleep.h"
+#include "lowpower.h"
 #define wakeupTime 		10 		// s 醒来之后的工作时间
 #define sleepDelayTime	1500  	// ms 开完门之后的延时时间 时间过短则舵机来不及恢复到初始位置 
 
@@ -34,7 +34,7 @@ Keypad kpd(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 void setup() {
 	// 设置睡眠和触摸唤醒
-	sleep::init();
+	lowpower::init();
 
 	// 设置指示灯
 	statusinfo::init();
@@ -101,5 +101,5 @@ void loop() {
 	
 	statusinfo::sleep();
 
-	sleep::start();
+	lowpower::start();
 } // loop

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace sleep {
+namespace lowpower {
 	void init();
 	void start();
 	void callback();

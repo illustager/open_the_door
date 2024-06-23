@@ -1,5 +1,6 @@
-#include "sleep.h"
+#include "lowpower.h"
 
+#include <Arduino.h>
 #include <esp_sleep.h>
 
 // ------------------------------ Touch config ------------------------------
@@ -7,7 +8,7 @@
 #define touchThreshold	5 		// 触摸阈值
 // ------------------------------ Touch config ------------------------------
 
-namespace sleep {
+namespace lowpower {
 	void init() {
 		esp_sleep_enable_touchpad_wakeup();
 	}
