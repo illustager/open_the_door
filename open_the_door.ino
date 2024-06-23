@@ -3,7 +3,7 @@
 
 //------------------------------------------------------------舵机
 #include "door.h"
-
+#include "statusinfo.h"
 //------------------------------------------------------------读卡器
 #include <myIC.h>
 myIC my_ic(rc522_SS_PIN,rc522_RST_PIN);
@@ -48,17 +48,13 @@ Keypad kpd(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 
 void setup() {
-#ifdef DEBUG
-	Serial.begin(115200);
-#endif
 	// 设置睡眠和触摸唤醒
 	esp_sleep_enable_touchpad_wakeup();
 	touchAttachInterrupt(touchPin, callbackFunc, touchThreshold);
 	touchDetachInterrupt(touchPin);
 
 	// 设置指示灯
-	pinMode(LEDPin, OUTPUT);
-	analogWrite(LEDPin, LEDoff); // digitalWrite(LEDPin, LOW);
+	statusinfo::init();
 
 	// 关门（复位）
 	door::close();
@@ -80,11 +76,8 @@ void setup() {
 } // setup
 
 void loop() {
-#ifdef DEBUG
-	Serial.println("Working...");
-#endif
 	// 指示灯提示 ESP32 唤醒
-	analogWrite(LEDPin, LEDinfo1);
+	statusinfo::wakeup();
 
 	uint64_t startTime = millis();
 	while( millis() - startTime < wakeupTime * 1000 ) { // 工作 wakeupTime 秒
@@ -107,7 +100,7 @@ void loop() {
 			#endif
 
 				// 开门 随后退出
-				analogWrite(LEDPin, LEDinfo2);
+				statusinfo::working();
 				is2play = true;
 				door::open();
 				delay(servoDelayTime * 1000);
@@ -120,11 +113,9 @@ void loop() {
 	is2play = false;
 	door::close();
 	delay(delayTime);
-	analogWrite(LEDPin, LEDoff);
 	
-#ifdef DEBUG
-	Serial.println("ESP32 will sleep now!");
-#endif
+	statusinfo::sleep();
+
 	touchAttachInterrupt(touchPin, callbackFunc, touchThreshold);
 	esp_deep_sleep_start();
 } // loop
