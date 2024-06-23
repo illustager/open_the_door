@@ -1,6 +1,6 @@
 # Open the door
 
-[中文](./README_CN.md)
+**[简体中文](./README_CN.md)**
 
 `open_the_door` is a project developed by me and a roomate during our free time, aiming to provide a more convenient way to open the dormitory door, so that we don't have to worry about our keys anymore. We have discussed and tested various solutions, such as remote door opening via the network, password input door opening, etc., but we ultimately chose to open the door by swiping the school card, considering energy consumption, security, and other factors. However, you can easily extend this project to other door opening methods.
 
