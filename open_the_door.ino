@@ -4,6 +4,9 @@
 //------------------------------------------------------------舵机
 #include "door.h"
 #include "statusinfo.h"
+
+#define openDelayTime 	1 	// s 开门所需时间
+
 //------------------------------------------------------------读卡器
 #include <myIC.h>
 myIC my_ic(rc522_SS_PIN,rc522_RST_PIN);
@@ -14,11 +17,9 @@ volatile bool working; 			// volatile !!!!!!!!!! 用于多线程之间的通信
 TaskHandle_t taskHandle = NULL; // 多线程句柄
 
 //------------------------------------------------------------休眠
-#include <esp_sleep.h>
-
-void callbackFunc() { // 回调函数
-	// Serial.println("good");
-}
+#include "sleep.h"
+#define wakeupTime 		10 		// s 醒来之后的工作时间
+#define sleepDelayTime	1500  	// ms 开完门之后的延时时间 时间过短则舵机来不及恢复到初始位置 
 
 //------------------------------------------------------------键盘和管理系统
 #include <Keypad.h>
@@ -33,9 +34,7 @@ Keypad kpd(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 void setup() {
 	// 设置睡眠和触摸唤醒
-	esp_sleep_enable_touchpad_wakeup();
-	touchAttachInterrupt(touchPin, callbackFunc, touchThreshold);
-	touchDetachInterrupt(touchPin);
+	sleep::init();
 
 	// 设置指示灯
 	statusinfo::init();
@@ -89,7 +88,7 @@ void loop() {
 				statusinfo::working();
 				working = true;
 				door::open();
-				delay(servoDelayTime * 1000);
+				delay(openDelayTime * 1000);
 
 				break;
 			}
@@ -98,10 +97,9 @@ void loop() {
 
 	working = false;
 	door::close();
-	delay(delayTime);
+	delay(sleepDelayTime);
 	
 	statusinfo::sleep();
 
-	touchAttachInterrupt(touchPin, callbackFunc, touchThreshold);
-	esp_deep_sleep_start();
+	sleep::start();
 } // loop
