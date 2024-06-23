@@ -9,25 +9,9 @@
 myIC my_ic(rc522_SS_PIN,rc522_RST_PIN);
 
 //------------------------------------------------------------音频
-#include <myAudio.h>
-myAudio my_audio(audioPin, audioNum, audioDatas);
-
-volatile bool is2play; 			// volatile !!!!!!!!!! 用于多线程之间的通信
-TaskHandle_t playHandle = NULL; // 多线程句柄
-
-void playTask(void*) { // 多线程任务函数 - 播放音频
-	static RTC_DATA_ATTR byte select = 0;
-	while(true) {
-		if( is2play ) {
-			my_audio.play(select);
-			is2play = false;
-			++select;
-		}
-	}
-#ifdef DEBUG
-	Serial.println("sound");
-#endif
-}
+#include "play.h"
+volatile bool working; 			// volatile !!!!!!!!!! 用于多线程之间的通信
+TaskHandle_t taskHandle = NULL; // 多线程句柄
 
 //------------------------------------------------------------休眠
 #include <esp_sleep.h>
@@ -59,13 +43,15 @@ void setup() {
 	// 关门（复位）
 	door::close();
 
+	working = false;
+
 	// 开门时播放音频
-	xTaskCreate(  playTask,         // 任务函数
+	xTaskCreate(  play::task,       // 任务函数
 				  "play",           // 任务名称
 				  8*1024,           // 任务栈大小，根据需要自行设置
-				  NULL,             // 参数 入参为空
+				  (void*)&working,  // 参数 入参为空
 				  1,                // 优先级
-				  &playHandle );    // 任务句柄
+				  &taskHandle );    // 任务句柄
 
 	// 第一次启动时加载用户数据
 	++times4wake;
@@ -101,7 +87,7 @@ void loop() {
 
 				// 开门 随后退出
 				statusinfo::working();
-				is2play = true;
+				working = true;
 				door::open();
 				delay(servoDelayTime * 1000);
 
@@ -110,7 +96,7 @@ void loop() {
 		}
 	}
 
-	is2play = false;
+	working = false;
 	door::close();
 	delay(delayTime);
 	
