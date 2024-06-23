@@ -2,8 +2,7 @@
 #include "config.h"
 
 //------------------------------------------------------------舵机
-#include <myServo.h>
-myServo my_servo(servoPin, servoMinPulse, servoMaxPulse);
+#include "door.h"
 
 //------------------------------------------------------------读卡器
 #include <myIC.h>
@@ -62,7 +61,7 @@ void setup() {
 	analogWrite(LEDPin, LEDoff); // digitalWrite(LEDPin, LOW);
 
 	// 关门（复位）
-	my_servo.work(servoCloseAngle);
+	door::close();
 
 	// 开门时播放音频
 	xTaskCreate(  playTask,         // 任务函数
@@ -110,7 +109,7 @@ void loop() {
 				// 开门 随后退出
 				analogWrite(LEDPin, LEDinfo2);
 				is2play = true;
-				my_servo.work(servoOpenAngle);
+				door::open();
 				delay(servoDelayTime * 1000);
 
 				break;
@@ -119,7 +118,7 @@ void loop() {
 	}
 
 	is2play = false;
-	my_servo.work(servoCloseAngle);
+	door::close();
 	delay(delayTime);
 	analogWrite(LEDPin, LEDoff);
 	
