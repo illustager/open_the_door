@@ -52,70 +52,50 @@ void setup() {
 #ifdef DEBUG
 	Serial.begin(115200);
 #endif
-
-	// for( byte i : rowPins ) {
-	// 	pinMode(i, INPUT);
-	// }
-	// for( byte i : colPins ) {
-	// 	pinMode(i, OUTPUT);
-	// }
-
-	// while( true ) {
-	// 	char key = kpd.getKey();
-
-	// 	if( key != NO_KEY ) {
-	// 		Serial.println(key);
-	// 	}
-	// }
-
-	// while(true) {
-	// 	Serial.println(touchRead(touchPin));
-	// 	delay(500);
-	// }
-
+	// 设置睡眠和触摸唤醒
 	esp_sleep_enable_touchpad_wakeup();
-	// 在 esp32 中 断分为两种 写入不同位置
-	// 一种是 RTC 中断 如定时器中断 触摸中断
-	// 另一种是 GPIO 中断
-	touchAttachInterrupt(touchPin, callbackFunc, threshold); // 引脚 回调函数 阈值
-	touchDetachInterrupt(touchPin); // 先解除中断 而后在 loop 中重新启用中断 以免多次触发中断
+	touchAttachInterrupt(touchPin, callbackFunc, touchThreshold);
+	touchDetachInterrupt(touchPin);
 
+	// 设置指示灯
 	pinMode(LEDPin, OUTPUT);
 	analogWrite(LEDPin, LEDoff); // digitalWrite(LEDPin, LOW);
 
-	my_servo.work(servoCloseAngle); // 初始化舵机
+	// 关门（复位）
+	my_servo.work(servoCloseAngle);
 
-	// xTaskCreate(  playTask,         // 任务函数
-	// 			  "play",           // 任务名称
-	// 			  8*1024,           // 任务栈大小，根据需要自行设置
-	// 			  NULL,             // 参数 入参为空
-	// 			  1,                // 优先级
-	// 			  &playHandle );    // 任务句柄
+	// 开门时播放音频
+	xTaskCreate(  playTask,         // 任务函数
+				  "play",           // 任务名称
+				  8*1024,           // 任务栈大小，根据需要自行设置
+				  NULL,             // 参数 入参为空
+				  1,                // 优先级
+				  &playHandle );    // 任务句柄
 
+	// 第一次启动时加载用户数据
 	++times4wake;
 	if( times4wake == 1 ) {
-		loadUserData();
+		manage::loadUserData();
 	}
 
 } // setup
 
 void loop() {
-
-// 实现 esp32 在唤醒后维持一段时间的运行
 #ifdef DEBUG
 	Serial.println("Working...");
 #endif
+	// 指示灯提示 ESP32 唤醒
 	analogWrite(LEDPin, LEDinfo1);
 
 	uint64_t startTime = millis();
-	while( millis() - startTime < wakeupTime * 1000 ) {
+	while( millis() - startTime < wakeupTime * 1000 ) { // 工作 wakeupTime 秒
 		if( kpd.getKey() == 'D' ) {
-			manage(&kpd, &my_ic);
+			manage::manage(&kpd, &my_ic); // 进入用户管理系统
 		}
 
 		if( my_ic.readyet() ) {
 			uint32_t uid = my_ic.read();
-			int check_flag = checkUserData(uid, NULL);
+			int check_flag = manage::checkUserData(uid, NULL);
 
 			#ifdef DEBUG
 				Serial.println(uid);
@@ -126,29 +106,26 @@ void loop() {
 			#ifdef DEBUG
 				Serial.println("Welcome!");
 			#endif
+
+				// 开门 随后退出
 				analogWrite(LEDPin, LEDinfo2);
 				is2play = true;
-			//---------------------------------------------------
 				my_servo.work(servoOpenAngle);
 				delay(servoDelayTime * 1000);
-			//-----------------------------------------
+
 				break;
 			}
 		}
 	}
 
+	is2play = false;
+	my_servo.work(servoCloseAngle);
+	delay(delayTime);
+	analogWrite(LEDPin, LEDoff);
 	
 #ifdef DEBUG
 	Serial.println("ESP32 will sleep now!");
 #endif
-
-	is2play = false;
-	my_servo.work(servoCloseAngle);
-
-	delay(delayTime);
-
-	analogWrite(LEDPin, LEDoff);
-	
-	touchAttachInterrupt(touchPin, callbackFunc, threshold);
+	touchAttachInterrupt(touchPin, callbackFunc, touchThreshold);
 	esp_deep_sleep_start();
 } // loop

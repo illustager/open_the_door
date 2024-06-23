@@ -145,7 +145,7 @@ static bool edit(myio::OLEDstream* myout, Keypad* kpd, myIC* my_ic) {
 	while( true ) {
 		if( my_ic->readyet() ) {
 			uint32_t uid = my_ic->read();
-			int idx = checkUserData(uid, userdata_cpy);
+			int idx = manage::checkUserData(uid, userdata_cpy);
 			// Serial.println(idx);
 
 			if( idx >= 0 ) {
@@ -159,7 +159,7 @@ static bool edit(myio::OLEDstream* myout, Keypad* kpd, myIC* my_ic) {
 					userdata_cpy[i] = uid;
 					dataSort(userdata_cpy, usermax);
 
-					i = checkUserData(uid, userdata_cpy);
+					i = manage::checkUserData(uid, userdata_cpy);
 				}
 			}
 			display4edit(myout, userdata_cpy);
@@ -228,6 +228,8 @@ static void nvsLoad(uint32_t* data, size_t size) {
 
 
 //------------------------------ Externs ------------------------------
+namespace manage {
+
 void loadUserData() {
 	nvsLoad(userdata, sizeof(userdata));
 }
@@ -282,4 +284,6 @@ LEV:
 	delete myout;
 	return;
 }
+
+} // manage
 
