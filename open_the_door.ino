@@ -1,19 +1,14 @@
-//------------------------------------------------------------配置
-#include "config.h"
-
 //------------------------------------------------------------舵机
 #include "door.h"
-#include "statusinfo.h"
 
 #define openDelayTime 	1 	// s 开门所需时间
 
-//------------------------------------------------------------读卡器
-#include <myIC.h>
-myIC my_ic(rc522_SS_PIN,rc522_RST_PIN);
+//------------------------------------------------------------指示灯
+#include "statusinfo.h"
 
 //------------------------------------------------------------音频
 #include "play.h"
-volatile bool working; 			// volatile !!!!!!!!!! 用于多线程之间的通信
+volatile bool working;			// 开门时为 true
 TaskHandle_t taskHandle = NULL; // 多线程句柄
 
 //------------------------------------------------------------休眠
@@ -21,16 +16,32 @@ TaskHandle_t taskHandle = NULL; // 多线程句柄
 #define wakeupTime 		10 		// s 醒来之后的工作时间
 #define sleepDelayTime	1500  	// ms 开完门之后的延时时间 时间过短则舵机来不及恢复到初始位置 
 
-//------------------------------------------------------------键盘和管理系统
-#include <Keypad.h>
-#include "manage.h"
+//------------------------------------------------------------键盘和读卡器
+#include <myIC.h>
+#define rc522_SS_PIN  	12
+#define rc522_RST_PIN 	27
+myIC my_ic(rc522_SS_PIN,rc522_RST_PIN);
 
-unsigned times4wake PROGMEM = 0;
+#include <Keypad.h>
+
+const byte ROWS = 4;
+const byte COLS = 4;
+byte rowPins[ROWS] = {32, 15, 17, 5};
+byte colPins[COLS] = {13, 14, 26, 16};
+char keys[ROWS][COLS] = {
+	{'1','2','3','A'},
+	{'4','5','6','B'},
+	{'7','8','9','C'},
+	{'*','0','#','D'}
+};
 
 Keypad kpd(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
-//------------------------------------------------------------
+//------------------------------------------------------------管理系统
+#include "manage.h"
+unsigned RTC_DATA_ATTR times4wake = 0; // 记录唤醒次数
 
+//------------------------------------------------------------
 
 void setup() {
 	// 设置睡眠和触摸唤醒
@@ -65,7 +76,8 @@ void loop() {
 	statusinfo::wakeup();
 
 	uint64_t startTime = millis();
-	while( millis() - startTime < wakeupTime * 1000 ) { // 工作 wakeupTime 秒
+	while( millis() - startTime < wakeupTime * 1000 )
+	{ // 工作 wakeupTime 秒
 		if( kpd.getKey() == 'D' ) {
 			manage::manage(&kpd, &my_ic); // 进入用户管理系统
 		}
@@ -74,16 +86,7 @@ void loop() {
 			uint32_t uid = my_ic.read();
 			int check_flag = manage::checkUserData(uid, NULL);
 
-			#ifdef DEBUG
-				Serial.println(uid);
-				Serial.println(check_flag);
-			#endif
-
 			if( check_flag >= 0 ) {
-			#ifdef DEBUG
-				Serial.println("Welcome!");
-			#endif
-
 				// 开门 随后退出
 				statusinfo::working();
 				working = true;
