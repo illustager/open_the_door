@@ -3,7 +3,7 @@
 #include <myAudio.h>
 
 // ------------------------------ Audio config ------------------------------
-#include "sound_data.h" // 音频数据
+#include "resource/sound_data.h" // 音频数据
 const byte *sound_datas[] = {	sound_data::cn,
 							  	sound_data::en,
 							  	sound_data::jp,
